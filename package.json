@@ -1,0 +1,29 @@
+{
+  "name": "omxjs",
+  "version": "0.0.2",
+  "description": "omx ts client",
+  "main": "src/index.ts",
+  "scripts": {
+    "code-gen": "./scripts/code-gen.sh",
+    "build": "tsc",
+    "test": "dts test",
+    "lint": "dts lint"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cosmwasm/ts-codegen": "^0.30.1",
+    "@terran-one/cosmwasm-vm-js": "^0.2.16",
+    "bech32": "^2.0.0",
+    "dts-cli": "^2.0.3",
+    "ts-jest": "^29.1.0",
+    "ts-loader": "^9.4.3",
+    "tslib": "^2.5.3",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "@cosmjs/amino": "^0.30.1",
+    "@cosmjs/cosmwasm-stargate": "^0.30.1",
+    "@types/long": "^4.0.1"
+  }
+}
