@@ -1,6 +1,22 @@
-# OMX typescript client
+# OMX typescript api
 
-Typescript client for the [OMX](https://www.omxapp.com/)
+Typescript client for interacting with [OMX](https://www.omxapp.com/) contracts.
+
+[![ReadTheDocs](https://readthedocs.org/projects/switcheo-python/badge/?version=latest)](https://docs.omxapp.com)
+[![license](https://img.shields.io/npm/l/omxjs.svg)](https://github.com/omxlabs/omxjs/blob/master/LICENSE.md)
+[![npm](https://img.shields.io/node/v/omxjs.svg)](https://www.npmjs.com/package/omxjs)
+[![npm](https://img.shields.io/npm/dt/omxjs.svg)](https://www.npmjs.com/package/omxjs)
+
+## Installation
+
+## Requirements
+
+- node >= 16, highly recommend to use [nvm](https://github.com/nvm-sh/nvm) (or [nvm-windows](https://github.com/coreybutler/nvm-windows))
+- [Osmosis localnet](https://github.com/osmosis-labs/osmosis/tree/main/tests/localosmosis) for testing
+
+```bash
+npm i omxjs
+```
 
 ## Examples
 

@@ -1,7 +1,17 @@
 {
   "name": "omxjs",
-  "version": "0.0.2",
+  "version": "0.0.3",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "description": "omx ts client",
+  "keywords": [
+    "omx",
+    "cosmos",
+    "cosmwasm",
+    "osmosis",
+    "osmo"
+  ],
   "main": "src/index.ts",
   "scripts": {
     "code-gen": "./scripts/code-gen.sh",
@@ -9,8 +19,8 @@
     "test": "dts test",
     "lint": "dts lint"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Omxadmin <omxlabs@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
     "@cosmwasm/ts-codegen": "^0.30.1",
     "@terran-one/cosmwasm-vm-js": "^0.2.16",
