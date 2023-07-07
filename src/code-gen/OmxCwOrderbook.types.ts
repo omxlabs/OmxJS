@@ -41,6 +41,8 @@ export type ExecuteMsg = {
 } | {
   execute_decrease_order: ExecuteDecreaseOrderExec;
 } | {
+  execute_decrease_order_cb: ExecuteDecreaseOrderCbExec;
+} | {
   execute_increase_order: ExecuteIncreaseOrderExec;
 } | {
   execute_increase_order_cb: ExecuteIncreaseOrderCbExec;
@@ -138,10 +140,11 @@ export interface CancelSwapOrderExec {
   order_index: Uint128;
 }
 export interface CreateDecreaseOrderInternalExec {
-  account: string;
+  account: Addr;
   collateral_delta: Uint128;
-  collateral_token: string;
-  index_token: string;
+  collateral_token: Addr;
+  execution_fee: Uint128;
+  index_token: Addr;
   is_long: boolean;
   size_delta: Uint128;
   trigger_above_threshold: boolean;
@@ -207,6 +210,25 @@ export interface ExecuteDecreaseOrderExec {
   address: string;
   fee_receiver: string;
   order_index: Uint128;
+}
+export interface ExecuteDecreaseOrderCbExec {
+  balance_before: Uint128;
+  current_price: Uint128;
+  fee_receiver: Addr;
+  order: DecreaseOrder;
+  order_index: Uint128;
+}
+export interface DecreaseOrder {
+  account: Addr;
+  collateral_delta: Uint128;
+  collateral_token: Addr;
+  execution_fee: Uint128;
+  index: Uint128;
+  index_token: Addr;
+  is_long: boolean;
+  size_delta: Uint128;
+  trigger_above_threshold: boolean;
+  trigger_price: Uint128;
 }
 export interface ExecuteIncreaseOrderExec {
   account: string;
@@ -359,25 +381,13 @@ export interface UsdoMinPriceQuery {
 export interface ValidatePositionOrderPriceQuery {
   index_token: string;
   maximize_price: boolean;
-  raise: boolean;
+  should_raise: boolean;
   trigger_above_threshold: boolean;
   trigger_price: Uint128;
 }
 export interface ValidateSwapOrderPriceQuery {
   path: SwapPath;
   trigger_ratio: Uint128;
-}
-export interface DecreaseOrder {
-  account: Addr;
-  collateral_delta: Uint128;
-  collateral_token: Addr;
-  execution_fee: Uint128;
-  index: Uint128;
-  index_token: Addr;
-  is_long: boolean;
-  size_delta: Uint128;
-  trigger_above_threshold: boolean;
-  trigger_price: Uint128;
 }
 export type Order = {
   swap: SwapOrder;

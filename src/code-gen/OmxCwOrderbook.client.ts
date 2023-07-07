@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { Uint128, InstantiateMsg, ExecuteMsg, Addr, PositionCollateral, SwapPath, ValidatedSwapPath, VaultSwapInternalExec, PurchaseTokenAmount, SetAdminExec, SetMinExecutionFeeExec, SetMinPurchaseTokenAmountUsdExec, CancelDecreaseOrderExec, CancelIncreaseOrderExec, CancelSwapOrderExec, CreateDecreaseOrderInternalExec, CreateDecreaseOrderExec, CreateIncreaseOrderInternalExec, CreateIncreaseOrderExec, CreateSwapOrderExec, CreateSwapOrderInternalExec, ExecuteDecreaseOrderExec, ExecuteIncreaseOrderExec, ExecuteIncreaseOrderCbExec, IncreaseOrder, ExecuteSwapOrderExec, ExecuteSwapOrderCbExec, SwapOrder, SwapInternalExec, TransferInOsmoInternalExec, TransferOutOsmoInternalExec, UpdateDecreaseOrderExec, UpdateIncreaseOrderExec, UpdateSwapOrderExec, SwapInternalCbExec, CreateIncreaseOrderSwapCbExec, CreateIncreaseOrderCbExec, QueryMsg, SwapOrderQuery, DecreaseOrderQuery, OrdersQuery, IncreaseOrderQuery, UsdoMinPriceQuery, ValidatePositionOrderPriceQuery, ValidateSwapOrderPriceQuery, DecreaseOrder, Order, TupleOfUint128AndBoolean, Boolean } from "./OmxCwOrderbook.types";
+import { Uint128, InstantiateMsg, ExecuteMsg, Addr, PositionCollateral, SwapPath, ValidatedSwapPath, VaultSwapInternalExec, PurchaseTokenAmount, SetAdminExec, SetMinExecutionFeeExec, SetMinPurchaseTokenAmountUsdExec, CancelDecreaseOrderExec, CancelIncreaseOrderExec, CancelSwapOrderExec, CreateDecreaseOrderInternalExec, CreateDecreaseOrderExec, CreateIncreaseOrderInternalExec, CreateIncreaseOrderExec, CreateSwapOrderExec, CreateSwapOrderInternalExec, ExecuteDecreaseOrderExec, ExecuteDecreaseOrderCbExec, DecreaseOrder, ExecuteIncreaseOrderExec, ExecuteIncreaseOrderCbExec, IncreaseOrder, ExecuteSwapOrderExec, ExecuteSwapOrderCbExec, SwapOrder, SwapInternalExec, TransferInOsmoInternalExec, TransferOutOsmoInternalExec, UpdateDecreaseOrderExec, UpdateIncreaseOrderExec, UpdateSwapOrderExec, SwapInternalCbExec, CreateIncreaseOrderSwapCbExec, CreateIncreaseOrderCbExec, QueryMsg, SwapOrderQuery, DecreaseOrderQuery, OrdersQuery, IncreaseOrderQuery, UsdoMinPriceQuery, ValidatePositionOrderPriceQuery, ValidateSwapOrderPriceQuery, Order, TupleOfUint128AndBoolean, Boolean } from "./OmxCwOrderbook.types";
 export interface OmxCwOrderbookReadOnlyInterface {
   contractAddress: string;
   swapOrder: ({
@@ -43,13 +43,13 @@ export interface OmxCwOrderbookReadOnlyInterface {
   validatePositionOrderPrice: ({
     indexToken,
     maximizePrice,
-    raise,
+    shouldRaise,
     triggerAboveThreshold,
     triggerPrice
   }: {
     indexToken: string;
     maximizePrice: boolean;
-    raise: boolean;
+    shouldRaise: boolean;
     triggerAboveThreshold: boolean;
     triggerPrice: Uint128;
   }) => Promise<TupleOfUint128AndBoolean>;
@@ -144,13 +144,13 @@ export class OmxCwOrderbookQueryClient implements OmxCwOrderbookReadOnlyInterfac
   validatePositionOrderPrice = async ({
     indexToken,
     maximizePrice,
-    raise,
+    shouldRaise,
     triggerAboveThreshold,
     triggerPrice
   }: {
     indexToken: string;
     maximizePrice: boolean;
-    raise: boolean;
+    shouldRaise: boolean;
     triggerAboveThreshold: boolean;
     triggerPrice: Uint128;
   }): Promise<TupleOfUint128AndBoolean> => {
@@ -158,7 +158,7 @@ export class OmxCwOrderbookQueryClient implements OmxCwOrderbookReadOnlyInterfac
       validate_position_order_price: {
         index_token: indexToken,
         maximize_price: maximizePrice,
-        raise,
+        should_raise: shouldRaise,
         trigger_above_threshold: triggerAboveThreshold,
         trigger_price: triggerPrice
       }
@@ -216,16 +216,18 @@ export interface OmxCwOrderbookInterface extends OmxCwOrderbookReadOnlyInterface
     account,
     collateralDelta,
     collateralToken,
+    executionFee,
     indexToken,
     isLong,
     sizeDelta,
     triggerAboveThreshold,
     triggerPrice
   }: {
-    account: string;
+    account: Addr;
     collateralDelta: Uint128;
-    collateralToken: string;
-    indexToken: string;
+    collateralToken: Addr;
+    executionFee: Uint128;
+    indexToken: Addr;
     isLong: boolean;
     sizeDelta: Uint128;
     triggerAboveThreshold: boolean;
@@ -345,6 +347,19 @@ export interface OmxCwOrderbookInterface extends OmxCwOrderbookReadOnlyInterface
   }: {
     address: string;
     feeReceiver: string;
+    orderIndex: Uint128;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  executeDecreaseOrderCb: ({
+    balanceBefore,
+    currentPrice,
+    feeReceiver,
+    order,
+    orderIndex
+  }: {
+    balanceBefore: Uint128;
+    currentPrice: Uint128;
+    feeReceiver: Addr;
+    order: DecreaseOrder;
     orderIndex: Uint128;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   executeIncreaseOrder: ({
@@ -541,6 +556,7 @@ export class OmxCwOrderbookClient extends OmxCwOrderbookQueryClient implements O
     this.createSwapOrder = this.createSwapOrder.bind(this);
     this.createSwapOrderInternal = this.createSwapOrderInternal.bind(this);
     this.executeDecreaseOrder = this.executeDecreaseOrder.bind(this);
+    this.executeDecreaseOrderCb = this.executeDecreaseOrderCb.bind(this);
     this.executeIncreaseOrder = this.executeIncreaseOrder.bind(this);
     this.executeIncreaseOrderCb = this.executeIncreaseOrderCb.bind(this);
     this.executeSwapOrder = this.executeSwapOrder.bind(this);
@@ -627,16 +643,18 @@ export class OmxCwOrderbookClient extends OmxCwOrderbookQueryClient implements O
     account,
     collateralDelta,
     collateralToken,
+    executionFee,
     indexToken,
     isLong,
     sizeDelta,
     triggerAboveThreshold,
     triggerPrice
   }: {
-    account: string;
+    account: Addr;
     collateralDelta: Uint128;
-    collateralToken: string;
-    indexToken: string;
+    collateralToken: Addr;
+    executionFee: Uint128;
+    indexToken: Addr;
     isLong: boolean;
     sizeDelta: Uint128;
     triggerAboveThreshold: boolean;
@@ -647,6 +665,7 @@ export class OmxCwOrderbookClient extends OmxCwOrderbookQueryClient implements O
         account,
         collateral_delta: collateralDelta,
         collateral_token: collateralToken,
+        execution_fee: executionFee,
         index_token: indexToken,
         is_long: isLong,
         size_delta: sizeDelta,
@@ -846,6 +865,29 @@ export class OmxCwOrderbookClient extends OmxCwOrderbookQueryClient implements O
       execute_decrease_order: {
         address,
         fee_receiver: feeReceiver,
+        order_index: orderIndex
+      }
+    }, fee, memo, _funds);
+  };
+  executeDecreaseOrderCb = async ({
+    balanceBefore,
+    currentPrice,
+    feeReceiver,
+    order,
+    orderIndex
+  }: {
+    balanceBefore: Uint128;
+    currentPrice: Uint128;
+    feeReceiver: Addr;
+    order: DecreaseOrder;
+    orderIndex: Uint128;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      execute_decrease_order_cb: {
+        balance_before: balanceBefore,
+        current_price: currentPrice,
+        fee_receiver: feeReceiver,
+        order,
         order_index: orderIndex
       }
     }, fee, memo, _funds);

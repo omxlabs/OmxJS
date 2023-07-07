@@ -165,7 +165,10 @@ export interface SetTokenConfigMsg {
   token_decimals: number;
   token_weight: Uint128;
 }
-export interface SetUsdoAmountMsg {}
+export interface SetUsdoAmountMsg {
+  amount: Uint128;
+  token: string;
+}
 export interface SwapMsg {
   recipient?: string | null;
   token_in: string;
@@ -407,7 +410,7 @@ export interface ValidateLiquidationQuery {
   collateral_token: string;
   index_token: string;
   is_long: boolean;
-  raise: boolean;
+  should_raise: boolean;
 }
 export interface DeltaResult {
   delta: Uint128;

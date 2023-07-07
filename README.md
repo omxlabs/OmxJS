@@ -79,7 +79,8 @@ console.log("position", position);
 
 ```bash
 npm i
-npm run code-gen
+# generate code for specific tag
+npm run code-gen v0.0.5
 ```
 
 ## Tests

@@ -239,13 +239,13 @@ export interface OmxCwVaultReadOnlyInterface {
     collateralToken,
     indexToken,
     isLong,
-    raise
+    shouldRaise
   }: {
     account: string;
     collateralToken: string;
     indexToken: string;
     isLong: boolean;
-    raise: boolean;
+    shouldRaise: boolean;
   }) => Promise<Uint128>;
 }
 export class OmxCwVaultQueryClient implements OmxCwVaultReadOnlyInterface {
@@ -749,13 +749,13 @@ export class OmxCwVaultQueryClient implements OmxCwVaultReadOnlyInterface {
     collateralToken,
     indexToken,
     isLong,
-    raise
+    shouldRaise
   }: {
     account: string;
     collateralToken: string;
     indexToken: string;
     isLong: boolean;
-    raise: boolean;
+    shouldRaise: boolean;
   }): Promise<Uint128> => {
     return this.client.queryContractSmart(this.contractAddress, {
       validate_liquidation: {
@@ -763,7 +763,7 @@ export class OmxCwVaultQueryClient implements OmxCwVaultReadOnlyInterface {
         collateral_token: collateralToken,
         index_token: indexToken,
         is_long: isLong,
-        raise
+        should_raise: shouldRaise
       }
     });
   };
@@ -933,7 +933,13 @@ export interface OmxCwVaultInterface extends OmxCwVaultReadOnlyInterface {
     tokenDecimals: number;
     tokenWeight: Uint128;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
-  setUsdoAmount: (fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  setUsdoAmount: ({
+    amount,
+    token
+  }: {
+    amount: Uint128;
+    token: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   swap: ({
     recipient,
     tokenIn,
@@ -1339,9 +1345,18 @@ export class OmxCwVaultClient extends OmxCwVaultQueryClient implements OmxCwVaul
       }
     }, fee, memo, _funds);
   };
-  setUsdoAmount = async (fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+  setUsdoAmount = async ({
+    amount,
+    token
+  }: {
+    amount: Uint128;
+    token: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
-      set_usdo_amount: {}
+      set_usdo_amount: {
+        amount,
+        token
+      }
     }, fee, memo, _funds);
   };
   swap = async ({
