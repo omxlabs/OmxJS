@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { Uint128, InstantiateMsg, ExecuteMsg, Addr, BuyUsdoMsg, SetIsLiquidatorMsg, AddRouterMsg, BuyUsdoCbMsg, ClearTokenConfigMsg, DecreasePositionMsg, DirectPoolDepositMsg, IncreasePositionMsg, LiquidatePositionMsg, SetRouterMsg, SellUsdoMsg, SellUsdoCbMsg, SellUsdoAmountMsg, SetFeesMsg, Duration, SetFundingRateMsg, SetTokenConfigMsg, SetUsdoAmountMsg, SwapMsg, UpdateCumulativeFundingRateMsg, WithdrawFeesMsg, SetInManagerModeMsg, SetInPrivateLiquidationModeMsg, SetIsSwapEnabledMsg, SetIsLeverageEnabledMsg, SetMaxGasPriceMsg, SetMaxGlobalShortPriceMsg, SetManagerMsg, SetAdminMsg, QueryMsg, Timestamp, Uint64, UtilizationQuery, CumulativeFundingRatesQuery, PositionLeverageQuery, TokenToUsdMinQuery, GlobalShortAveragePricesQuery, GlobalShortSizesQuery, PositionDeltaQuery, ReservedAmountsQuery, GuaranteedUsdQuery, UsdoAmountQuery, EntryFundingRateQuery, NextGlobalShortAveragePriceQuery, NextFundingRateQuery, FundingFeeQuery, MinPriceQuery, MaxPriceQuery, RedemptionAmountQuery, TargetUsdoAmountQuery, AdjustForDecimalsQuery, IsRouterApprovedQuery, GetDeltaQuery, RedemptionCollateralQuery, RedemptionCollateralUsdQuery, PositionFeeQuery, MaxGlobalShortPriceQuery, NextAveragePriceQuery, IsManagerQuery, PoolAmountQuery, WhitelistedTokenQuery, PositionQuery, FeeReservesQuery, ValidateLiquidationQuery, DeltaResult, Boolean, Position, VaultConfig, VaultState, WhitelistedToken } from "./OmxCwVault.types";
+import { Uint128, InstantiateMsg, ExecuteMsg, Addr, BuyUsdoMsg, SetIsLiquidatorMsg, AddRouterMsg, BuyUsdoCbMsg, ClearTokenConfigMsg, DecreasePositionMsg, DirectPoolDepositMsg, IncreasePositionMsg, LiquidatePositionMsg, SetRouterMsg, SellUsdoMsg, SellUsdoCbMsg, SellUsdoAmountMsg, SetFeesMsg, Duration, SetFundingRateMsg, SetTokenConfigMsg, SetUsdoAmountMsg, SwapMsg, UpdateCumulativeFundingRateMsg, WithdrawFeesMsg, SetInManagerModeMsg, SetInPrivateLiquidationModeMsg, SetIsSwapEnabledMsg, SetIsLeverageEnabledMsg, SetMaxGasPriceMsg, SetMaxGlobalShortPriceMsg, SetManagerMsg, SetAdminMsg, QueryMsg, Timestamp, Uint64, UtilizationQuery, CumulativeFundingRatesQuery, PositionLeverageQuery, TokenToUsdMinQuery, GlobalShortAveragePricesQuery, GlobalShortSizesQuery, PositionDeltaQuery, ReservedAmountsQuery, GuaranteedUsdQuery, UsdoAmountQuery, EntryFundingRateQuery, NextGlobalShortAveragePriceQuery, NextFundingRateQuery, FundingFeeQuery, MinPriceQuery, MaxPriceQuery, RedemptionAmountQuery, TargetUsdoAmountQuery, AdjustForDecimalsQuery, IsRouterApprovedQuery, GetDeltaQuery, RedemptionCollateralQuery, RedemptionCollateralUsdQuery, PositionFeeQuery, MaxGlobalShortPriceQuery, NextAveragePriceQuery, IsManagerQuery, PoolAmountQuery, WhitelistedTokenQuery, PositionsQuery, PositionQuery, FeeReservesQuery, ValidateLiquidationQuery, DeltaResult, Boolean, Position, ArrayOfPositionKey, PositionKey, VaultConfig, VaultState, WhitelistedToken } from "./OmxCwVault.types";
 export interface OmxCwVaultReadOnlyInterface {
   contractAddress: string;
   vaultState: () => Promise<VaultState>;
@@ -218,6 +218,19 @@ export interface OmxCwVaultReadOnlyInterface {
   }: {
     token: string;
   }) => Promise<WhitelistedToken>;
+  positions: ({
+    account,
+    collateralToken,
+    indexToken,
+    isLong,
+    valid
+  }: {
+    account?: string;
+    collateralToken?: string;
+    indexToken?: string;
+    isLong?: boolean;
+    valid?: boolean;
+  }) => Promise<ArrayOfPositionKey>;
   position: ({
     account,
     collateralToken,
@@ -286,6 +299,7 @@ export class OmxCwVaultQueryClient implements OmxCwVaultReadOnlyInterface {
     this.isManager = this.isManager.bind(this);
     this.poolAmount = this.poolAmount.bind(this);
     this.whitelistedToken = this.whitelistedToken.bind(this);
+    this.positions = this.positions.bind(this);
     this.position = this.position.bind(this);
     this.feeReserves = this.feeReserves.bind(this);
     this.validateLiquidation = this.validateLiquidation.bind(this);
@@ -710,6 +724,29 @@ export class OmxCwVaultQueryClient implements OmxCwVaultReadOnlyInterface {
     return this.client.queryContractSmart(this.contractAddress, {
       whitelisted_token: {
         token
+      }
+    });
+  };
+  positions = async ({
+    account,
+    collateralToken,
+    indexToken,
+    isLong,
+    valid
+  }: {
+    account?: string;
+    collateralToken?: string;
+    indexToken?: string;
+    isLong?: boolean;
+    valid?: boolean;
+  }): Promise<ArrayOfPositionKey> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      positions: {
+        account,
+        collateral_token: collateralToken,
+        index_token: indexToken,
+        is_long: isLong,
+        valid
       }
     });
   };

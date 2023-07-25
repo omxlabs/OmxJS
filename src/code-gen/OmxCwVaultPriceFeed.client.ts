@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { InstantiateMsg, ExecuteMsg, Addr, SetAdminExec, SetTokenConfigExec, SetPriceSampleSpaceExec, QueryMsg, PriceQuery, Uint128 } from "./OmxCwVaultPriceFeed.types";
+import { InstantiateMsg, ExecuteMsg, Identifier, SetAdminExec, SetTokenConfigExec, SetPriceFeedExec, SetMaxPriceAgeExec, QueryMsg, PriceQuery, Uint128 } from "./OmxCwVaultPriceFeed.types";
 export interface OmxCwVaultPriceFeedReadOnlyInterface {
   contractAddress: string;
   price: ({
@@ -53,20 +53,23 @@ export interface OmxCwVaultPriceFeedInterface extends OmxCwVaultPriceFeedReadOnl
   setAdmin: ({
     admin
   }: {
-    admin: Addr;
+    admin: string;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   setTokenConfig: ({
     isStrictStable,
-    priceDecimals,
     priceFeed,
     token
   }: {
     isStrictStable: boolean;
-    priceDecimals: number;
-    priceFeed: string;
+    priceFeed: Identifier;
     token: string;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
-  setPriceSampleSpace: ({
+  setPriceFeed: ({
+    address
+  }: {
+    address: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  setMaxPriceAge: ({
     value
   }: {
     value: number;
@@ -84,13 +87,14 @@ export class OmxCwVaultPriceFeedClient extends OmxCwVaultPriceFeedQueryClient im
     this.contractAddress = contractAddress;
     this.setAdmin = this.setAdmin.bind(this);
     this.setTokenConfig = this.setTokenConfig.bind(this);
-    this.setPriceSampleSpace = this.setPriceSampleSpace.bind(this);
+    this.setPriceFeed = this.setPriceFeed.bind(this);
+    this.setMaxPriceAge = this.setMaxPriceAge.bind(this);
   }
 
   setAdmin = async ({
     admin
   }: {
-    admin: Addr;
+    admin: string;
   }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       set_admin: {
@@ -100,31 +104,39 @@ export class OmxCwVaultPriceFeedClient extends OmxCwVaultPriceFeedQueryClient im
   };
   setTokenConfig = async ({
     isStrictStable,
-    priceDecimals,
     priceFeed,
     token
   }: {
     isStrictStable: boolean;
-    priceDecimals: number;
-    priceFeed: string;
+    priceFeed: Identifier;
     token: string;
   }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       set_token_config: {
         is_strict_stable: isStrictStable,
-        price_decimals: priceDecimals,
         price_feed: priceFeed,
         token
       }
     }, fee, memo, _funds);
   };
-  setPriceSampleSpace = async ({
+  setPriceFeed = async ({
+    address
+  }: {
+    address: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      set_price_feed: {
+        address
+      }
+    }, fee, memo, _funds);
+  };
+  setMaxPriceAge = async ({
     value
   }: {
     value: number;
   }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
-      set_price_sample_space: {
+      set_max_price_age: {
         value
       }
     }, fee, memo, _funds);

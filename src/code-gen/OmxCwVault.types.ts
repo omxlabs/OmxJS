@@ -270,6 +270,8 @@ export type QueryMsg = {
 } | {
   whitelisted_token: WhitelistedTokenQuery;
 } | {
+  positions: PositionsQuery;
+} | {
   position: PositionQuery;
 } | {
   fee_reserves: FeeReservesQuery;
@@ -396,6 +398,13 @@ export interface PoolAmountQuery {
 export interface WhitelistedTokenQuery {
   token: string;
 }
+export interface PositionsQuery {
+  account?: string | null;
+  collateral_token?: string | null;
+  index_token?: string | null;
+  is_long?: boolean | null;
+  valid?: boolean | null;
+}
 export interface PositionQuery {
   account: string;
   collateral_token: string;
@@ -425,6 +434,13 @@ export interface Position {
   realized_pnl: number;
   reserve_amount: Uint128;
   size: Uint128;
+}
+export type ArrayOfPositionKey = PositionKey[];
+export interface PositionKey {
+  account: Addr;
+  collateral_token: Addr;
+  index_token: Addr;
+  is_long: boolean;
 }
 export interface VaultConfig {
   usdo: Addr;

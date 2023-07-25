@@ -11,27 +11,33 @@ export interface InstantiateMsg {
   eth: string;
   eth_busd: string;
   is_amm_enabled: boolean;
+  max_price_age: number;
   osmo: string;
   osmo_eth: string;
+  pyth_price_feed: string;
 }
 export type ExecuteMsg = {
   set_admin: SetAdminExec;
 } | {
   set_token_config: SetTokenConfigExec;
 } | {
-  set_price_sample_space: SetPriceSampleSpaceExec;
+  set_price_feed: SetPriceFeedExec;
+} | {
+  set_max_price_age: SetMaxPriceAgeExec;
 };
-export type Addr = string;
+export type Identifier = string;
 export interface SetAdminExec {
-  admin: Addr;
+  admin: string;
 }
 export interface SetTokenConfigExec {
   is_strict_stable: boolean;
-  price_decimals: number;
-  price_feed: string;
+  price_feed: Identifier;
   token: string;
 }
-export interface SetPriceSampleSpaceExec {
+export interface SetPriceFeedExec {
+  address: string;
+}
+export interface SetMaxPriceAgeExec {
   value: number;
 }
 export type QueryMsg = {
