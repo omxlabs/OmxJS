@@ -389,6 +389,7 @@ export interface ValidateSwapOrderPriceQuery {
   path: SwapPath;
   trigger_ratio: Uint128;
 }
+export interface MigrateMsg {}
 export type Order = {
   swap: SwapOrder;
 } | {

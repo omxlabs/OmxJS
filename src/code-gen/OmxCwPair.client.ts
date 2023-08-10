@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { InstantiateMsg, ExecuteMsg, Uint128, QueryMsg, TupleOfUint128AndUint128 } from "./OmxCwPair.types";
+import { InstantiateMsg, ExecuteMsg, Uint128, QueryMsg, MigrateMsg, TupleOfUint128AndUint128 } from "./OmxCwPair.types";
 export interface OmxCwPairReadOnlyInterface {
   contractAddress: string;
   reserves: () => Promise<TupleOfUint128AndUint128>;

@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { InstantiateMsg, ExecuteMsg, Addr, SetAdminExec, QueryMsg, PriceQuery, Uint128 } from "./OmxCwOlpManager.types";
+import { InstantiateMsg, ExecuteMsg, Addr, SetAdminExec, QueryMsg, PriceQuery, MigrateMsg, Uint128 } from "./OmxCwOlpManager.types";
 export interface OmxCwOlpManagerReadOnlyInterface {
   contractAddress: string;
   price: () => Promise<Uint128>;

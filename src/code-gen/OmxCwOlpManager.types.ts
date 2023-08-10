@@ -18,4 +18,5 @@ export type QueryMsg = {
   price: PriceQuery;
 };
 export interface PriceQuery {}
+export interface MigrateMsg {}
 export type Uint128 = string;

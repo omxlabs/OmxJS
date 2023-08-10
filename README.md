@@ -27,9 +27,9 @@ import { OmxCwRouterClient, OmxCwVaultClient } from "omxjs";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 // replace with the addresses of the contracts on your chain
-const vaultAddress = "osmo1wtzqlaftl9ckd6r8hrscke200qs08k2q79xxm96qmnexrvhw20wsnxu8sf";
-const routerAddress = "osmo16vjqj8yvm9tgjjmmengenuz29zt2enjytzq4yvmy908s28ze5lxqgpael2";
-const osmoAddress = "osmo1je8h6m8zve079knpazatp338w308233h7mt73ucwzhndqadmtrksx22nms";
+const vaultAddress = "osmo1...";
+const routerAddress = "osmo1...";
+const osmoAddress = "osmo1...";
 
 const ownAddress = "osmo1a..."; // replace with your address
 const cwClient: SigningCosmWasmClient = ...; // create a client for the chain with signer you prefer
@@ -80,7 +80,7 @@ console.log("position", position);
 ```bash
 npm i
 # generate code for specific tag
-npm run code-gen v0.0.7
+npm run code-gen v0.0.10
 ```
 
 ## Tests

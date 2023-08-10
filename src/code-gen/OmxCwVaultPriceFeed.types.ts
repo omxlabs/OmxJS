@@ -48,4 +48,5 @@ export interface PriceQuery {
   maximize: boolean;
   token: string;
 }
+export interface MigrateMsg {}
 export type Uint128 = string;

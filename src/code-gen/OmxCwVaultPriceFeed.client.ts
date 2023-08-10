@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { InstantiateMsg, ExecuteMsg, Identifier, SetAdminExec, SetTokenConfigExec, SetPriceFeedExec, SetMaxPriceAgeExec, QueryMsg, PriceQuery, Uint128 } from "./OmxCwVaultPriceFeed.types";
+import { InstantiateMsg, ExecuteMsg, Identifier, SetAdminExec, SetTokenConfigExec, SetPriceFeedExec, SetMaxPriceAgeExec, QueryMsg, PriceQuery, MigrateMsg, Uint128 } from "./OmxCwVaultPriceFeed.types";
 export interface OmxCwVaultPriceFeedReadOnlyInterface {
   contractAddress: string;
   price: ({

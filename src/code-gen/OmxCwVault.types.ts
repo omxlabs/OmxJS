@@ -10,6 +10,8 @@ export interface InstantiateMsg {
   funding_rate_factor: Uint128;
   liquidation_fee_usd: Uint128;
   price_feed: string;
+  price_impact_exp: number;
+  price_impact_factor: Uint128;
   stable_funding_rate_factor: Uint128;
   usdo: string;
 }
@@ -37,8 +39,6 @@ export type ExecuteMsg = {
   sell_usdo: SellUsdoMsg;
 } | {
   sell_usdo_cb: SellUsdoCbMsg;
-} | {
-  sell_usdo_amount: SellUsdoAmountMsg;
 } | {
   set_fees: SetFeesMsg;
 } | {
@@ -130,10 +130,6 @@ export interface SellUsdoCbMsg {
   redemption_amount: Uint128;
   token: Addr;
   usdo_amount: Uint128;
-}
-export interface SellUsdoAmountMsg {
-  amount: Uint128;
-  token: string;
 }
 export interface SetFeesMsg {
   has_dynamic_fees: boolean;
@@ -421,6 +417,7 @@ export interface ValidateLiquidationQuery {
   is_long: boolean;
   should_raise: boolean;
 }
+export interface MigrateMsg {}
 export interface DeltaResult {
   delta: Uint128;
   has_profit: boolean;
@@ -464,6 +461,8 @@ export interface VaultState {
   min_profit_time: Duration;
   mint_burn_fee_basis_points: Uint128;
   price_feed: Addr;
+  price_impact_exp: number;
+  price_impact_factor: Uint128;
   router?: Addr | null;
   stable_funding_rate_factor: Uint128;
   stable_swap_fee_basis_points: Uint128;

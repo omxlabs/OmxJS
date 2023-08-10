@@ -267,4 +267,5 @@ export interface ApprovedPluginQuery {
 export interface HasPluginQuery {
   plugin: string;
 }
+export interface MigrateMsg {}
 export type Boolean = boolean;

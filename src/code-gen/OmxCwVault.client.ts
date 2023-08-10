@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { Uint128, InstantiateMsg, ExecuteMsg, Addr, BuyUsdoMsg, SetIsLiquidatorMsg, AddRouterMsg, BuyUsdoCbMsg, ClearTokenConfigMsg, DecreasePositionMsg, DirectPoolDepositMsg, IncreasePositionMsg, LiquidatePositionMsg, SetRouterMsg, SellUsdoMsg, SellUsdoCbMsg, SellUsdoAmountMsg, SetFeesMsg, Duration, SetFundingRateMsg, SetTokenConfigMsg, SetUsdoAmountMsg, SwapMsg, UpdateCumulativeFundingRateMsg, WithdrawFeesMsg, SetInManagerModeMsg, SetInPrivateLiquidationModeMsg, SetIsSwapEnabledMsg, SetIsLeverageEnabledMsg, SetMaxGasPriceMsg, SetMaxGlobalShortPriceMsg, SetManagerMsg, SetAdminMsg, QueryMsg, Timestamp, Uint64, UtilizationQuery, CumulativeFundingRatesQuery, PositionLeverageQuery, TokenToUsdMinQuery, GlobalShortAveragePricesQuery, GlobalShortSizesQuery, PositionDeltaQuery, ReservedAmountsQuery, GuaranteedUsdQuery, UsdoAmountQuery, EntryFundingRateQuery, NextGlobalShortAveragePriceQuery, NextFundingRateQuery, FundingFeeQuery, MinPriceQuery, MaxPriceQuery, RedemptionAmountQuery, TargetUsdoAmountQuery, AdjustForDecimalsQuery, IsRouterApprovedQuery, GetDeltaQuery, RedemptionCollateralQuery, RedemptionCollateralUsdQuery, PositionFeeQuery, MaxGlobalShortPriceQuery, NextAveragePriceQuery, IsManagerQuery, PoolAmountQuery, WhitelistedTokenQuery, PositionsQuery, PositionQuery, FeeReservesQuery, ValidateLiquidationQuery, DeltaResult, Boolean, Position, ArrayOfPositionKey, PositionKey, VaultConfig, VaultState, WhitelistedToken } from "./OmxCwVault.types";
+import { Uint128, InstantiateMsg, ExecuteMsg, Addr, BuyUsdoMsg, SetIsLiquidatorMsg, AddRouterMsg, BuyUsdoCbMsg, ClearTokenConfigMsg, DecreasePositionMsg, DirectPoolDepositMsg, IncreasePositionMsg, LiquidatePositionMsg, SetRouterMsg, SellUsdoMsg, SellUsdoCbMsg, SetFeesMsg, Duration, SetFundingRateMsg, SetTokenConfigMsg, SetUsdoAmountMsg, SwapMsg, UpdateCumulativeFundingRateMsg, WithdrawFeesMsg, SetInManagerModeMsg, SetInPrivateLiquidationModeMsg, SetIsSwapEnabledMsg, SetIsLeverageEnabledMsg, SetMaxGasPriceMsg, SetMaxGlobalShortPriceMsg, SetManagerMsg, SetAdminMsg, QueryMsg, Timestamp, Uint64, UtilizationQuery, CumulativeFundingRatesQuery, PositionLeverageQuery, TokenToUsdMinQuery, GlobalShortAveragePricesQuery, GlobalShortSizesQuery, PositionDeltaQuery, ReservedAmountsQuery, GuaranteedUsdQuery, UsdoAmountQuery, EntryFundingRateQuery, NextGlobalShortAveragePriceQuery, NextFundingRateQuery, FundingFeeQuery, MinPriceQuery, MaxPriceQuery, RedemptionAmountQuery, TargetUsdoAmountQuery, AdjustForDecimalsQuery, IsRouterApprovedQuery, GetDeltaQuery, RedemptionCollateralQuery, RedemptionCollateralUsdQuery, PositionFeeQuery, MaxGlobalShortPriceQuery, NextAveragePriceQuery, IsManagerQuery, PoolAmountQuery, WhitelistedTokenQuery, PositionsQuery, PositionQuery, FeeReservesQuery, ValidateLiquidationQuery, MigrateMsg, DeltaResult, Boolean, Position, ArrayOfPositionKey, PositionKey, VaultConfig, VaultState, WhitelistedToken } from "./OmxCwVault.types";
 export interface OmxCwVaultReadOnlyInterface {
   contractAddress: string;
   vaultState: () => Promise<VaultState>;
@@ -916,13 +916,6 @@ export interface OmxCwVaultInterface extends OmxCwVaultReadOnlyInterface {
     token: Addr;
     usdoAmount: Uint128;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
-  sellUsdoAmount: ({
-    amount,
-    token
-  }: {
-    amount: Uint128;
-    token: string;
-  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   setFees: ({
     hasDynamicFees,
     liquidationFeeUsd,
@@ -1065,7 +1058,6 @@ export class OmxCwVaultClient extends OmxCwVaultQueryClient implements OmxCwVaul
     this.setRouter = this.setRouter.bind(this);
     this.sellUsdo = this.sellUsdo.bind(this);
     this.sellUsdoCb = this.sellUsdoCb.bind(this);
-    this.sellUsdoAmount = this.sellUsdoAmount.bind(this);
     this.setFees = this.setFees.bind(this);
     this.setFundingRate = this.setFundingRate.bind(this);
     this.setTokenConfig = this.setTokenConfig.bind(this);
@@ -1284,20 +1276,6 @@ export class OmxCwVaultClient extends OmxCwVaultQueryClient implements OmxCwVaul
         redemption_amount: redemptionAmount,
         token,
         usdo_amount: usdoAmount
-      }
-    }, fee, memo, _funds);
-  };
-  sellUsdoAmount = async ({
-    amount,
-    token
-  }: {
-    amount: Uint128;
-    token: string;
-  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
-    return await this.client.execute(this.sender, this.contractAddress, {
-      sell_usdo_amount: {
-        amount,
-        token
       }
     }, fee, memo, _funds);
   };

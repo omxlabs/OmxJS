@@ -19,4 +19,5 @@ export type Uint128 = string;
 export type QueryMsg = {
   reserves: {};
 };
+export interface MigrateMsg {}
 export type TupleOfUint128AndUint128 = [Uint128, Uint128];
