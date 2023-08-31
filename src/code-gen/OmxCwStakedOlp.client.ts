@@ -6,8 +6,8 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { Uint128, InstantiateMsg, MinterResponse, ExecuteMsg, Binary, Expiration, Timestamp, Uint64, Logo, EmbeddedLogo, QueryMsg, AllAccountsResponse, AllAllowancesResponse, AllowanceInfo, AllSpenderAllowancesResponse, SpenderAllowanceInfo, AllowanceResponse, BalanceResponse, DownloadLogoResponse, String, LogoInfo, Addr, MarketingInfoResponse, TokenInfoResponse } from "./OmxCwBaseToken.types";
-export interface OmxCwBaseTokenReadOnlyInterface {
+import { InstantiateMsg, ExecuteMsg, Uint128, Binary, Expiration, Timestamp, Uint64, Logo, EmbeddedLogo, QueryMsg, AllAccountsResponse, AllAllowancesResponse, AllowanceInfo, AllSpenderAllowancesResponse, SpenderAllowanceInfo, AllowanceResponse, BalanceResponse, DownloadLogoResponse, LogoInfo, Addr, MarketingInfoResponse, MinterResponse, TokenInfoResponse } from "./OmxCwStakedOlp.types";
+export interface OmxCwStakedOlpReadOnlyInterface {
   contractAddress: string;
   balance: ({
     address
@@ -50,15 +50,8 @@ export interface OmxCwBaseTokenReadOnlyInterface {
   }) => Promise<AllAccountsResponse>;
   marketingInfo: () => Promise<MarketingInfoResponse>;
   downloadLogo: () => Promise<DownloadLogoResponse>;
-  totalStaked: () => Promise<Uint128>;
-  stakedBalance: ({
-    account
-  }: {
-    account: string;
-  }) => Promise<BalanceResponse>;
-  id: () => Promise<String>;
 }
-export class OmxCwBaseTokenQueryClient implements OmxCwBaseTokenReadOnlyInterface {
+export class OmxCwStakedOlpQueryClient implements OmxCwStakedOlpReadOnlyInterface {
   client: CosmWasmClient;
   contractAddress: string;
 
@@ -74,9 +67,6 @@ export class OmxCwBaseTokenQueryClient implements OmxCwBaseTokenReadOnlyInterfac
     this.allAccounts = this.allAccounts.bind(this);
     this.marketingInfo = this.marketingInfo.bind(this);
     this.downloadLogo = this.downloadLogo.bind(this);
-    this.totalStaked = this.totalStaked.bind(this);
-    this.stakedBalance = this.stakedBalance.bind(this);
-    this.id = this.id.bind(this);
   }
 
   balance = async ({
@@ -172,29 +162,8 @@ export class OmxCwBaseTokenQueryClient implements OmxCwBaseTokenReadOnlyInterfac
       download_logo: {}
     });
   };
-  totalStaked = async (): Promise<Uint128> => {
-    return this.client.queryContractSmart(this.contractAddress, {
-      total_staked: {}
-    });
-  };
-  stakedBalance = async ({
-    account
-  }: {
-    account: string;
-  }): Promise<BalanceResponse> => {
-    return this.client.queryContractSmart(this.contractAddress, {
-      staked_balance: {
-        account
-      }
-    });
-  };
-  id = async (): Promise<String> => {
-    return this.client.queryContractSmart(this.contractAddress, {
-      id: {}
-    });
-  };
 }
-export interface OmxCwBaseTokenInterface extends OmxCwBaseTokenReadOnlyInterface {
+export interface OmxCwStakedOlpInterface extends OmxCwStakedOlpReadOnlyInterface {
   contractAddress: string;
   sender: string;
   transfer: ({
@@ -203,6 +172,11 @@ export interface OmxCwBaseTokenInterface extends OmxCwBaseTokenReadOnlyInterface
   }: {
     amount: Uint128;
     recipient: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  burn: ({
+    amount
+  }: {
+    amount: Uint128;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   send: ({
     amount,
@@ -280,30 +254,8 @@ export interface OmxCwBaseTokenInterface extends OmxCwBaseTokenReadOnlyInterface
     project?: string;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   uploadLogo: (logo: Logo, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
-  addAdmin: ({
-    account
-  }: {
-    account: string;
-  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
-  removeAdmin: ({
-    account
-  }: {
-    account: string;
-  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
-  setInPrivateTransferMode: ({
-    value
-  }: {
-    value: boolean;
-  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
-  setHandler: ({
-    account,
-    isHandler
-  }: {
-    account: string;
-    isHandler: boolean;
-  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
 }
-export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements OmxCwBaseTokenInterface {
+export class OmxCwStakedOlpClient extends OmxCwStakedOlpQueryClient implements OmxCwStakedOlpInterface {
   client: SigningCosmWasmClient;
   sender: string;
   contractAddress: string;
@@ -314,6 +266,7 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
     this.sender = sender;
     this.contractAddress = contractAddress;
     this.transfer = this.transfer.bind(this);
+    this.burn = this.burn.bind(this);
     this.send = this.send.bind(this);
     this.increaseAllowance = this.increaseAllowance.bind(this);
     this.decreaseAllowance = this.decreaseAllowance.bind(this);
@@ -324,10 +277,6 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
     this.updateMinter = this.updateMinter.bind(this);
     this.updateMarketing = this.updateMarketing.bind(this);
     this.uploadLogo = this.uploadLogo.bind(this);
-    this.addAdmin = this.addAdmin.bind(this);
-    this.removeAdmin = this.removeAdmin.bind(this);
-    this.setInPrivateTransferMode = this.setInPrivateTransferMode.bind(this);
-    this.setHandler = this.setHandler.bind(this);
   }
 
   transfer = async ({
@@ -341,6 +290,17 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
       transfer: {
         amount,
         recipient
+      }
+    }, fee, memo, _funds);
+  };
+  burn = async ({
+    amount
+  }: {
+    amount: Uint128;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      burn: {
+        amount
       }
     }, fee, memo, _funds);
   };
@@ -491,53 +451,6 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
   uploadLogo = async (logo: Logo, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       upload_logo: logo
-    }, fee, memo, _funds);
-  };
-  addAdmin = async ({
-    account
-  }: {
-    account: string;
-  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
-    return await this.client.execute(this.sender, this.contractAddress, {
-      add_admin: {
-        account
-      }
-    }, fee, memo, _funds);
-  };
-  removeAdmin = async ({
-    account
-  }: {
-    account: string;
-  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
-    return await this.client.execute(this.sender, this.contractAddress, {
-      remove_admin: {
-        account
-      }
-    }, fee, memo, _funds);
-  };
-  setInPrivateTransferMode = async ({
-    value
-  }: {
-    value: boolean;
-  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
-    return await this.client.execute(this.sender, this.contractAddress, {
-      set_in_private_transfer_mode: {
-        value
-      }
-    }, fee, memo, _funds);
-  };
-  setHandler = async ({
-    account,
-    isHandler
-  }: {
-    account: string;
-    isHandler: boolean;
-  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
-    return await this.client.execute(this.sender, this.contractAddress, {
-      set_handler: {
-        account,
-        is_handler: isHandler
-      }
     }, fee, memo, _funds);
   };
 }

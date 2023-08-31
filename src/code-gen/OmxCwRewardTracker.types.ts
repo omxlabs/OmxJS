@@ -6,20 +6,29 @@
 
 export type Uint128 = string;
 export interface InstantiateMsg {
-  decimals: number;
-  id: string;
+  admin?: string | null;
+  deposit_tokens: string[];
   mint?: MinterResponse | null;
   name: string;
   symbol: string;
+  vault: string;
 }
 export interface MinterResponse {
   cap?: Uint128 | null;
   minter: string;
 }
 export type ExecuteMsg = {
+  initialize: {
+    distributor: string;
+  };
+} | {
   transfer: {
     amount: Uint128;
     recipient: string;
+  };
+} | {
+  burn: {
+    amount: Uint128;
   };
 } | {
   send: {
@@ -75,11 +84,7 @@ export type ExecuteMsg = {
 } | {
   upload_logo: Logo;
 } | {
-  add_admin: {
-    account: string;
-  };
-} | {
-  remove_admin: {
+  set_admin: {
     account: string;
   };
 } | {
@@ -87,9 +92,57 @@ export type ExecuteMsg = {
     value: boolean;
   };
 } | {
+  set_in_private_claiming_mode: {
+    value: boolean;
+  };
+} | {
+  set_in_private_staking_mode: {
+    value: boolean;
+  };
+} | {
   set_handler: {
     account: string;
     is_handler: boolean;
+  };
+} | {
+  set_deposit_token: {
+    is_deposit_token: boolean;
+    token: string;
+  };
+} | {
+  stake: {
+    amount: Uint128;
+    deposit_token: string;
+  };
+} | {
+  stake_for_account: {
+    account: string;
+    amount: Uint128;
+    deposit_token: string;
+    funding_account: string;
+  };
+} | {
+  unstake: {
+    amount: Uint128;
+    deposit_token: string;
+  };
+} | {
+  unstake_for_account: {
+    account: string;
+    amount: Uint128;
+    deposit_token: string;
+    recipient: string;
+  };
+} | {
+  update_rewards: {};
+} | {
+  claim: {
+    recipient: string;
+  };
+} | {
+  claim_for_account: {
+    account: string;
+    recipient: string;
   };
 };
 export type Binary = string;
@@ -147,14 +200,46 @@ export type QueryMsg = {
 } | {
   download_logo: {};
 } | {
-  total_staked: {};
-} | {
-  staked_balance: {
+  claimable: {
     account: string;
   };
 } | {
-  id: {};
+  deposit_balance: {
+    account: string;
+    token: string;
+  };
+} | {
+  cumulative_rewards: {
+    account: string;
+  };
+} | {
+  average_staked_amount: {
+    account: string;
+  };
+} | {
+  total_deposit_supply: {
+    token: string;
+  };
+} | {
+  staked_amount: {
+    account: string;
+  };
+} | {
+  reward_token: {};
+} | {
+  initialized: {};
+} | {
+  is_handler: {
+    account: string;
+  };
+} | {
+  is_deposit_token: {
+    token: string;
+  };
+} | {
+  reward_tracker_state: {};
 };
+export interface MigrateMsg {}
 export interface AllAccountsResponse {
   accounts: string[];
   [k: string]: unknown;
@@ -189,7 +274,7 @@ export interface DownloadLogoResponse {
   data: Binary;
   mime_type: string;
 }
-export type String = string;
+export type Boolean = boolean;
 export type LogoInfo = {
   url: string;
 } | "embedded";
@@ -200,6 +285,15 @@ export interface MarketingInfoResponse {
   marketing?: Addr | null;
   project?: string | null;
   [k: string]: unknown;
+}
+export interface RewardTrackerInitializedState {
+  admin: Addr;
+  cumulative_reward_per_token: Uint128;
+  distributor: Addr;
+  in_private_claiming_mode: boolean;
+  in_private_staking_mode: boolean;
+  in_private_transfer_mode: boolean;
+  vault: Addr;
 }
 export interface TokenInfoResponse {
   decimals: number;

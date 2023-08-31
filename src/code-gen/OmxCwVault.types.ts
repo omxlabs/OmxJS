@@ -264,6 +264,8 @@ export type QueryMsg = {
 } | {
   pool_amount: PoolAmountQuery;
 } | {
+  all_whitelisted_tokens: AllWhitelistedTokensQuery;
+} | {
   whitelisted_token: WhitelistedTokenQuery;
 } | {
   positions: PositionsQuery;
@@ -273,6 +275,8 @@ export type QueryMsg = {
   fee_reserves: FeeReservesQuery;
 } | {
   validate_liquidation: ValidateLiquidationQuery;
+} | {
+  all_whitelisted_tokens_amount: AllWhitelistedTokensAmountQuery;
 };
 export type Timestamp = Uint64;
 export type Uint64 = string;
@@ -391,6 +395,9 @@ export interface IsManagerQuery {
 export interface PoolAmountQuery {
   token: string;
 }
+export interface AllWhitelistedTokensQuery {
+  index: number;
+}
 export interface WhitelistedTokenQuery {
   token: string;
 }
@@ -417,7 +424,9 @@ export interface ValidateLiquidationQuery {
   is_long: boolean;
   should_raise: boolean;
 }
+export interface AllWhitelistedTokensAmountQuery {}
 export interface MigrateMsg {}
+export type Uint32 = number;
 export interface DeltaResult {
   delta: Uint128;
   has_profit: boolean;
@@ -471,7 +480,7 @@ export interface VaultState {
   tax_basis_points: Uint128;
   total_token_weights: Uint128;
   use_swap_pricing: boolean;
-  whitelisted_token_count: Uint128;
+  whitelisted_token_count: number;
 }
 export interface WhitelistedToken {
   decimals: number;

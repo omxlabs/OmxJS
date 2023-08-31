@@ -4,22 +4,20 @@
 * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
 */
 
-export type Uint128 = string;
 export interface InstantiateMsg {
-  decimals: number;
-  id: string;
-  mint?: MinterResponse | null;
-  name: string;
-  symbol: string;
-}
-export interface MinterResponse {
-  cap?: Uint128 | null;
-  minter: string;
+  fee_olp_tracker: string;
+  olp: string;
+  olp_manager: string;
+  staked_olp_tracker: string;
 }
 export type ExecuteMsg = {
   transfer: {
     amount: Uint128;
     recipient: string;
+  };
+} | {
+  burn: {
+    amount: Uint128;
   };
 } | {
   send: {
@@ -74,24 +72,8 @@ export type ExecuteMsg = {
   };
 } | {
   upload_logo: Logo;
-} | {
-  add_admin: {
-    account: string;
-  };
-} | {
-  remove_admin: {
-    account: string;
-  };
-} | {
-  set_in_private_transfer_mode: {
-    value: boolean;
-  };
-} | {
-  set_handler: {
-    account: string;
-    is_handler: boolean;
-  };
 };
+export type Uint128 = string;
 export type Binary = string;
 export type Expiration = {
   at_height: number;
@@ -146,14 +128,6 @@ export type QueryMsg = {
   marketing_info: {};
 } | {
   download_logo: {};
-} | {
-  total_staked: {};
-} | {
-  staked_balance: {
-    account: string;
-  };
-} | {
-  id: {};
 };
 export interface AllAccountsResponse {
   accounts: string[];
@@ -189,7 +163,6 @@ export interface DownloadLogoResponse {
   data: Binary;
   mime_type: string;
 }
-export type String = string;
 export type LogoInfo = {
   url: string;
 } | "embedded";
@@ -200,6 +173,10 @@ export interface MarketingInfoResponse {
   marketing?: Addr | null;
   project?: string | null;
   [k: string]: unknown;
+}
+export interface MinterResponse {
+  cap?: Uint128 | null;
+  minter: string;
 }
 export interface TokenInfoResponse {
   decimals: number;

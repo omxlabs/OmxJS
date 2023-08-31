@@ -1,6 +1,6 @@
 {
   "name": "omxjs",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "engines": {
     "node": ">=16.0.0"
   },
@@ -16,7 +16,6 @@
   "scripts": {
     "code-gen": "./scripts/code-gen.sh",
     "build": "tsc",
-    "test": "dts test",
     "lint": "dts lint"
   },
   "author": "Omxadmin <omxlabs@gmail.com>",

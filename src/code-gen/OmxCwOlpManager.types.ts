@@ -6,17 +6,148 @@
 
 export interface InstantiateMsg {
   admin?: string | null;
+  cooldown_sec: number;
+  olp: string;
+  shorts_tracker: string;
+  usdo: string;
+  vault: string;
 }
 export type ExecuteMsg = {
   set_admin: SetAdminExec;
+} | {
+  set_private_mode: SetPrivateModeExec;
+} | {
+  set_shorts_tracker: SetShortsTrackerExec;
+} | {
+  set_average_price_weight: SetAveragePriceWeightExec;
+} | {
+  set_handler: SetHandlerExec;
+} | {
+  set_cooldown_duration: SetCooldownDurationExec;
+} | {
+  set_aum_adjustment: SetAumAdjustmentExec;
+} | {
+  remove_liquidity_cb: RemoveLiquidityCb;
+} | {
+  remove_liquidity: RemoveLiquidityExec;
+} | {
+  remove_liquidity_for_account: RemoveLiquidityForAccountExec;
+} | {
+  add_liquidity_cb: AddLiquidityCb;
+} | {
+  add_liquidity: AddLiquidityExec;
+} | {
+  add_liquidity_for_account: AddLiquidityForAccountExec;
 };
+export type Uint128 = string;
 export type Addr = string;
 export interface SetAdminExec {
-  admin: Addr;
+  admin: string;
+}
+export interface SetPrivateModeExec {
+  in_private_mode: boolean;
+}
+export interface SetShortsTrackerExec {
+  shorts_tracker: string;
+}
+export interface SetAveragePriceWeightExec {
+  value: Uint128;
+}
+export interface SetHandlerExec {
+  account: string;
+  is_handler: boolean;
+}
+export interface SetCooldownDurationExec {
+  value: number;
+}
+export interface SetAumAdjustmentExec {
+  aum_addition: Uint128;
+  aum_deduction: Uint128;
+}
+export interface RemoveLiquidityCb {
+  account: string;
+  aum_in_usdo: Uint128;
+  balance_before: Uint128;
+  min_out: Uint128;
+  olp_amount: Uint128;
+  olp_supply: Uint128;
+  receiver: string;
+  token_out: string;
+}
+export interface RemoveLiquidityExec {
+  min_out: Uint128;
+  olp_amount: Uint128;
+  receiver: string;
+  token_out: string;
+}
+export interface RemoveLiquidityForAccountExec {
+  account: string;
+  min_out: Uint128;
+  olp_amount: Uint128;
+  recipient: string;
+  token_out: string;
+}
+export interface AddLiquidityCb {
+  account: Addr;
+  amount: Uint128;
+  aum_in_usdo: Uint128;
+  balance_before: Uint128;
+  min_olp: Uint128;
+  min_usdo: Uint128;
+  olp_supply: Uint128;
+  token: string;
+}
+export interface AddLiquidityExec {
+  amount: Uint128;
+  min_olp: Uint128;
+  min_usdo: Uint128;
+  token: string;
+}
+export interface AddLiquidityForAccountExec {
+  account: string;
+  amount: Uint128;
+  funding_account: string;
+  min_olp: Uint128;
+  min_usdo: Uint128;
+  token: string;
 }
 export type QueryMsg = {
-  price: PriceQuery;
+  global_short_delta: GlobalShortDeltaQuery;
+} | {
+  global_short_average_price: GlobalShortAveragePriceQuery;
+} | {
+  aum_in_usdo: AumInUsdoQuery;
+} | {
+  aum: AumQuery;
+} | {
+  add_cd_end: AddCdEndQuery;
+} | {
+  last_added_at: LastAddedAtQuery;
+} | {
+  cd_duration: CdDurationQuery;
 };
-export interface PriceQuery {}
+export interface GlobalShortDeltaQuery {
+  price: Uint128;
+  size: Uint128;
+  token: string;
+}
+export interface GlobalShortAveragePriceQuery {
+  token: string;
+}
+export interface AumInUsdoQuery {
+  maximize: boolean;
+}
+export interface AumQuery {
+  maximize: boolean;
+}
+export interface AddCdEndQuery {
+  account: string;
+}
+export interface LastAddedAtQuery {
+  account: string;
+}
+export interface CdDurationQuery {}
 export interface MigrateMsg {}
-export type Uint128 = string;
+export type Timestamp = Uint64;
+export type Uint64 = string;
+export type TupleOfUint128AndBoolean = [Uint128, boolean];

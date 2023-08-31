@@ -80,20 +80,5 @@ console.log("position", position);
 ```bash
 npm i
 # generate code for specific tag
-npm run code-gen v0.0.10
-```
-
-## Tests
-
-Before running the tests, you need to [compile wasm binaries](https://github.com/chadury2021/gmx_wasm#check-everything-and-build) for the contracts.
-Alternatively you can use the binaries in the [actions artifacts](https://github.com/chadury2021/gmx_wasm/actions).
-
-In any case, you need to copy all the `.wasm` files to the `./artifacts` folder (if you don't have it, create it).
-
-### Run tests
-
-```bash
-npm i
-
-npm test
+npm run code-gen v0.0.11
 ```

@@ -6,8 +6,8 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { Uint128, InstantiateMsg, MinterResponse, ExecuteMsg, Binary, Expiration, Timestamp, Uint64, Logo, EmbeddedLogo, QueryMsg, AllAccountsResponse, AllAllowancesResponse, AllowanceInfo, AllSpenderAllowancesResponse, SpenderAllowanceInfo, AllowanceResponse, BalanceResponse, DownloadLogoResponse, String, LogoInfo, Addr, MarketingInfoResponse, TokenInfoResponse } from "./OmxCwBaseToken.types";
-export interface OmxCwBaseTokenReadOnlyInterface {
+import { Uint128, InstantiateMsg, MinterResponse, ExecuteMsg, Binary, Expiration, Timestamp, Uint64, Logo, EmbeddedLogo, QueryMsg, MigrateMsg, AllAccountsResponse, AllAllowancesResponse, AllowanceInfo, AllSpenderAllowancesResponse, SpenderAllowanceInfo, AllowanceResponse, BalanceResponse, DownloadLogoResponse, Boolean, LogoInfo, Addr, MarketingInfoResponse, RewardTrackerInitializedState, TokenInfoResponse } from "./OmxCwRewardTracker.types";
+export interface OmxCwRewardTrackerReadOnlyInterface {
   contractAddress: string;
   balance: ({
     address
@@ -50,15 +50,53 @@ export interface OmxCwBaseTokenReadOnlyInterface {
   }) => Promise<AllAccountsResponse>;
   marketingInfo: () => Promise<MarketingInfoResponse>;
   downloadLogo: () => Promise<DownloadLogoResponse>;
-  totalStaked: () => Promise<Uint128>;
-  stakedBalance: ({
+  claimable: ({
     account
   }: {
     account: string;
-  }) => Promise<BalanceResponse>;
-  id: () => Promise<String>;
+  }) => Promise<Uint128>;
+  depositBalance: ({
+    account,
+    token
+  }: {
+    account: string;
+    token: string;
+  }) => Promise<Uint128>;
+  cumulativeRewards: ({
+    account
+  }: {
+    account: string;
+  }) => Promise<Uint128>;
+  averageStakedAmount: ({
+    account
+  }: {
+    account: string;
+  }) => Promise<Uint128>;
+  totalDepositSupply: ({
+    token
+  }: {
+    token: string;
+  }) => Promise<Uint128>;
+  stakedAmount: ({
+    account
+  }: {
+    account: string;
+  }) => Promise<Uint128>;
+  rewardToken: () => Promise<Addr>;
+  initialized: () => Promise<Boolean>;
+  isHandler: ({
+    account
+  }: {
+    account: string;
+  }) => Promise<Boolean>;
+  isDepositToken: ({
+    token
+  }: {
+    token: string;
+  }) => Promise<Boolean>;
+  rewardTrackerState: () => Promise<RewardTrackerInitializedState>;
 }
-export class OmxCwBaseTokenQueryClient implements OmxCwBaseTokenReadOnlyInterface {
+export class OmxCwRewardTrackerQueryClient implements OmxCwRewardTrackerReadOnlyInterface {
   client: CosmWasmClient;
   contractAddress: string;
 
@@ -74,9 +112,17 @@ export class OmxCwBaseTokenQueryClient implements OmxCwBaseTokenReadOnlyInterfac
     this.allAccounts = this.allAccounts.bind(this);
     this.marketingInfo = this.marketingInfo.bind(this);
     this.downloadLogo = this.downloadLogo.bind(this);
-    this.totalStaked = this.totalStaked.bind(this);
-    this.stakedBalance = this.stakedBalance.bind(this);
-    this.id = this.id.bind(this);
+    this.claimable = this.claimable.bind(this);
+    this.depositBalance = this.depositBalance.bind(this);
+    this.cumulativeRewards = this.cumulativeRewards.bind(this);
+    this.averageStakedAmount = this.averageStakedAmount.bind(this);
+    this.totalDepositSupply = this.totalDepositSupply.bind(this);
+    this.stakedAmount = this.stakedAmount.bind(this);
+    this.rewardToken = this.rewardToken.bind(this);
+    this.initialized = this.initialized.bind(this);
+    this.isHandler = this.isHandler.bind(this);
+    this.isDepositToken = this.isDepositToken.bind(this);
+    this.rewardTrackerState = this.rewardTrackerState.bind(this);
   }
 
   balance = async ({
@@ -172,37 +218,132 @@ export class OmxCwBaseTokenQueryClient implements OmxCwBaseTokenReadOnlyInterfac
       download_logo: {}
     });
   };
-  totalStaked = async (): Promise<Uint128> => {
-    return this.client.queryContractSmart(this.contractAddress, {
-      total_staked: {}
-    });
-  };
-  stakedBalance = async ({
+  claimable = async ({
     account
   }: {
     account: string;
-  }): Promise<BalanceResponse> => {
+  }): Promise<Uint128> => {
     return this.client.queryContractSmart(this.contractAddress, {
-      staked_balance: {
+      claimable: {
         account
       }
     });
   };
-  id = async (): Promise<String> => {
+  depositBalance = async ({
+    account,
+    token
+  }: {
+    account: string;
+    token: string;
+  }): Promise<Uint128> => {
     return this.client.queryContractSmart(this.contractAddress, {
-      id: {}
+      deposit_balance: {
+        account,
+        token
+      }
+    });
+  };
+  cumulativeRewards = async ({
+    account
+  }: {
+    account: string;
+  }): Promise<Uint128> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      cumulative_rewards: {
+        account
+      }
+    });
+  };
+  averageStakedAmount = async ({
+    account
+  }: {
+    account: string;
+  }): Promise<Uint128> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      average_staked_amount: {
+        account
+      }
+    });
+  };
+  totalDepositSupply = async ({
+    token
+  }: {
+    token: string;
+  }): Promise<Uint128> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      total_deposit_supply: {
+        token
+      }
+    });
+  };
+  stakedAmount = async ({
+    account
+  }: {
+    account: string;
+  }): Promise<Uint128> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      staked_amount: {
+        account
+      }
+    });
+  };
+  rewardToken = async (): Promise<Addr> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      reward_token: {}
+    });
+  };
+  initialized = async (): Promise<Boolean> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      initialized: {}
+    });
+  };
+  isHandler = async ({
+    account
+  }: {
+    account: string;
+  }): Promise<Boolean> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      is_handler: {
+        account
+      }
+    });
+  };
+  isDepositToken = async ({
+    token
+  }: {
+    token: string;
+  }): Promise<Boolean> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      is_deposit_token: {
+        token
+      }
+    });
+  };
+  rewardTrackerState = async (): Promise<RewardTrackerInitializedState> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      reward_tracker_state: {}
     });
   };
 }
-export interface OmxCwBaseTokenInterface extends OmxCwBaseTokenReadOnlyInterface {
+export interface OmxCwRewardTrackerInterface extends OmxCwRewardTrackerReadOnlyInterface {
   contractAddress: string;
   sender: string;
+  initialize: ({
+    distributor
+  }: {
+    distributor: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   transfer: ({
     amount,
     recipient
   }: {
     amount: Uint128;
     recipient: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  burn: ({
+    amount
+  }: {
+    amount: Uint128;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   send: ({
     amount,
@@ -280,17 +421,22 @@ export interface OmxCwBaseTokenInterface extends OmxCwBaseTokenReadOnlyInterface
     project?: string;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   uploadLogo: (logo: Logo, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
-  addAdmin: ({
-    account
-  }: {
-    account: string;
-  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
-  removeAdmin: ({
+  setAdmin: ({
     account
   }: {
     account: string;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   setInPrivateTransferMode: ({
+    value
+  }: {
+    value: boolean;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  setInPrivateClaimingMode: ({
+    value
+  }: {
+    value: boolean;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  setInPrivateStakingMode: ({
     value
   }: {
     value: boolean;
@@ -302,8 +448,64 @@ export interface OmxCwBaseTokenInterface extends OmxCwBaseTokenReadOnlyInterface
     account: string;
     isHandler: boolean;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  setDepositToken: ({
+    isDepositToken,
+    token
+  }: {
+    isDepositToken: boolean;
+    token: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  stake: ({
+    amount,
+    depositToken
+  }: {
+    amount: Uint128;
+    depositToken: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  stakeForAccount: ({
+    account,
+    amount,
+    depositToken,
+    fundingAccount
+  }: {
+    account: string;
+    amount: Uint128;
+    depositToken: string;
+    fundingAccount: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  unstake: ({
+    amount,
+    depositToken
+  }: {
+    amount: Uint128;
+    depositToken: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  unstakeForAccount: ({
+    account,
+    amount,
+    depositToken,
+    recipient
+  }: {
+    account: string;
+    amount: Uint128;
+    depositToken: string;
+    recipient: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  updateRewards: (fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  claim: ({
+    recipient
+  }: {
+    recipient: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
+  claimForAccount: ({
+    account,
+    recipient
+  }: {
+    account: string;
+    recipient: string;
+  }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
 }
-export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements OmxCwBaseTokenInterface {
+export class OmxCwRewardTrackerClient extends OmxCwRewardTrackerQueryClient implements OmxCwRewardTrackerInterface {
   client: SigningCosmWasmClient;
   sender: string;
   contractAddress: string;
@@ -313,7 +515,9 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
     this.client = client;
     this.sender = sender;
     this.contractAddress = contractAddress;
+    this.initialize = this.initialize.bind(this);
     this.transfer = this.transfer.bind(this);
+    this.burn = this.burn.bind(this);
     this.send = this.send.bind(this);
     this.increaseAllowance = this.increaseAllowance.bind(this);
     this.decreaseAllowance = this.decreaseAllowance.bind(this);
@@ -324,12 +528,32 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
     this.updateMinter = this.updateMinter.bind(this);
     this.updateMarketing = this.updateMarketing.bind(this);
     this.uploadLogo = this.uploadLogo.bind(this);
-    this.addAdmin = this.addAdmin.bind(this);
-    this.removeAdmin = this.removeAdmin.bind(this);
+    this.setAdmin = this.setAdmin.bind(this);
     this.setInPrivateTransferMode = this.setInPrivateTransferMode.bind(this);
+    this.setInPrivateClaimingMode = this.setInPrivateClaimingMode.bind(this);
+    this.setInPrivateStakingMode = this.setInPrivateStakingMode.bind(this);
     this.setHandler = this.setHandler.bind(this);
+    this.setDepositToken = this.setDepositToken.bind(this);
+    this.stake = this.stake.bind(this);
+    this.stakeForAccount = this.stakeForAccount.bind(this);
+    this.unstake = this.unstake.bind(this);
+    this.unstakeForAccount = this.unstakeForAccount.bind(this);
+    this.updateRewards = this.updateRewards.bind(this);
+    this.claim = this.claim.bind(this);
+    this.claimForAccount = this.claimForAccount.bind(this);
   }
 
+  initialize = async ({
+    distributor
+  }: {
+    distributor: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      initialize: {
+        distributor
+      }
+    }, fee, memo, _funds);
+  };
   transfer = async ({
     amount,
     recipient
@@ -341,6 +565,17 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
       transfer: {
         amount,
         recipient
+      }
+    }, fee, memo, _funds);
+  };
+  burn = async ({
+    amount
+  }: {
+    amount: Uint128;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      burn: {
+        amount
       }
     }, fee, memo, _funds);
   };
@@ -493,24 +728,13 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
       upload_logo: logo
     }, fee, memo, _funds);
   };
-  addAdmin = async ({
+  setAdmin = async ({
     account
   }: {
     account: string;
   }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
-      add_admin: {
-        account
-      }
-    }, fee, memo, _funds);
-  };
-  removeAdmin = async ({
-    account
-  }: {
-    account: string;
-  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
-    return await this.client.execute(this.sender, this.contractAddress, {
-      remove_admin: {
+      set_admin: {
         account
       }
     }, fee, memo, _funds);
@@ -526,6 +750,28 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
       }
     }, fee, memo, _funds);
   };
+  setInPrivateClaimingMode = async ({
+    value
+  }: {
+    value: boolean;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      set_in_private_claiming_mode: {
+        value
+      }
+    }, fee, memo, _funds);
+  };
+  setInPrivateStakingMode = async ({
+    value
+  }: {
+    value: boolean;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      set_in_private_staking_mode: {
+        value
+      }
+    }, fee, memo, _funds);
+  };
   setHandler = async ({
     account,
     isHandler
@@ -537,6 +783,118 @@ export class OmxCwBaseTokenClient extends OmxCwBaseTokenQueryClient implements O
       set_handler: {
         account,
         is_handler: isHandler
+      }
+    }, fee, memo, _funds);
+  };
+  setDepositToken = async ({
+    isDepositToken,
+    token
+  }: {
+    isDepositToken: boolean;
+    token: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      set_deposit_token: {
+        is_deposit_token: isDepositToken,
+        token
+      }
+    }, fee, memo, _funds);
+  };
+  stake = async ({
+    amount,
+    depositToken
+  }: {
+    amount: Uint128;
+    depositToken: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      stake: {
+        amount,
+        deposit_token: depositToken
+      }
+    }, fee, memo, _funds);
+  };
+  stakeForAccount = async ({
+    account,
+    amount,
+    depositToken,
+    fundingAccount
+  }: {
+    account: string;
+    amount: Uint128;
+    depositToken: string;
+    fundingAccount: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      stake_for_account: {
+        account,
+        amount,
+        deposit_token: depositToken,
+        funding_account: fundingAccount
+      }
+    }, fee, memo, _funds);
+  };
+  unstake = async ({
+    amount,
+    depositToken
+  }: {
+    amount: Uint128;
+    depositToken: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      unstake: {
+        amount,
+        deposit_token: depositToken
+      }
+    }, fee, memo, _funds);
+  };
+  unstakeForAccount = async ({
+    account,
+    amount,
+    depositToken,
+    recipient
+  }: {
+    account: string;
+    amount: Uint128;
+    depositToken: string;
+    recipient: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      unstake_for_account: {
+        account,
+        amount,
+        deposit_token: depositToken,
+        recipient
+      }
+    }, fee, memo, _funds);
+  };
+  updateRewards = async (fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      update_rewards: {}
+    }, fee, memo, _funds);
+  };
+  claim = async ({
+    recipient
+  }: {
+    recipient: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      claim: {
+        recipient
+      }
+    }, fee, memo, _funds);
+  };
+  claimForAccount = async ({
+    account,
+    recipient
+  }: {
+    account: string;
+    recipient: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      claim_for_account: {
+        account,
+        recipient
       }
     }, fee, memo, _funds);
   };
