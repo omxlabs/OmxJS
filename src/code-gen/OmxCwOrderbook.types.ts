@@ -369,7 +369,8 @@ export interface DecreaseOrderQuery {
   order_index: Uint128;
 }
 export interface OrdersQuery {
-  ready: boolean;
+  account?: string | null;
+  ready?: boolean | null;
 }
 export interface IncreaseOrderQuery {
   account: string;

@@ -24,9 +24,11 @@ export interface OmxCwOrderbookReadOnlyInterface {
     orderIndex: Uint128;
   }) => Promise<DecreaseOrder>;
   orders: ({
+    account,
     ready
   }: {
-    ready: boolean;
+    account?: string;
+    ready?: boolean;
   }) => Promise<Order>;
   increaseOrder: ({
     account,
@@ -106,12 +108,15 @@ export class OmxCwOrderbookQueryClient implements OmxCwOrderbookReadOnlyInterfac
     });
   };
   orders = async ({
+    account,
     ready
   }: {
-    ready: boolean;
+    account?: string;
+    ready?: boolean;
   }): Promise<Order> => {
     return this.client.queryContractSmart(this.contractAddress, {
       orders: {
+        account,
         ready
       }
     });
